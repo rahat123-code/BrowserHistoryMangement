@@ -1,0 +1,110 @@
+#include <iostream>
+#include <vector>
+#include <string>
+
+class HistoryEntry {
+public:
+    std::string url;
+    std::string timestamp;
+
+    HistoryEntry(const std::string& url) : url(url) {
+       
+        timestamp = "Timestamp: " + getCurrentTimestamp();
+    }
+
+  
+    std::string getCurrentTimestamp() {
+       
+        return "HH:MM:SS";
+    }
+};
+
+class Settings {
+public:
+    bool showTimestamps;
+
+    Settings() : showTimestamps(true) {}
+};
+
+class BrowserHistoryManager {
+private:
+    std::vector<HistoryEntry> history;
+    size_t currentIndex;
+    Settings settings;
+
+public:
+    BrowserHistoryManager() : currentIndex(0) {}
+
+    // Add a new URL to the browsing history
+    void addHistory(const std::string& url) {
+        history.resize(currentIndex + 1);
+        history.emplace_back(url);
+        currentIndex++;
+    }
+
+    // Navigate backward in history
+    void goBack() {
+        if (currentIndex > 0) {
+            currentIndex--;
+            displayCurrentPage();
+        } else {
+            std::cout << "No more history to go back." << std::endl;
+        }
+    }
+
+    // Navigate forward in history
+    void goForward() {
+        if (currentIndex < history.size() - 1) {
+            currentIndex++;
+            displayCurrentPage();
+        } else {
+            std::cout << "No more history to go forward." << std::endl;
+        }
+    }
+
+    // Clear browsing history
+    void clearHistory() {
+        history.clear();
+        currentIndex = 0;
+        std::cout << "Browsing history cleared." << std::endl;
+    }
+
+    // Display the current page with optional timestamp
+    void displayCurrentPage() {
+        const auto& entry = history[currentIndex];
+        std::cout << "Current Page: " << entry.url;
+        if (settings.showTimestamps) {
+            std::cout << " (" << entry.timestamp << ")";
+        }
+        std::cout << std::endl;
+    }
+
+    // Set history settings
+    void setSettings(const Settings& newSettings) {
+        settings = newSettings;
+    }
+};
+
+int main() {
+    BrowserHistoryManager historyManager;
+
+    historyManager.addHistory("https://www.example.com");
+    historyManager.addHistory("https://www.example.com/page1");
+    historyManager.addHistory("https://www.example.com/page2");
+
+    historyManager.goBack();
+    historyManager.goForward();
+    historyManager.goBack();
+
+    historyManager.clearHistory();
+
+    // Simulate changing settings
+    Settings newSettings;
+    newSettings.showTimestamps = false;
+    historyManager.setSettings(newSettings);
+
+    historyManager.addHistory("https://www.example.com/page3");
+    historyManager.goBack();
+
+    return 0;
+}
